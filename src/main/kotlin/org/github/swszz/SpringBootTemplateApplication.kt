@@ -9,7 +9,7 @@ import org.springframework.boot.runApplication
     exclude = [
         DataSourceAutoConfiguration::class,
         DataJdbcRepositoriesAutoConfiguration::class
-    ]
+    ],
 )
 internal class SpringBootTemplateApplication {
     companion object {
