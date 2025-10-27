@@ -24,15 +24,20 @@ dependencies {
     implementation(libs.kotlin.coroutines.test)
     implementation(libs.kotlin.coroutines.core)
 
+    implementation(platform(libs.spring.modulith.bom))
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
-    implementation(libs.spring.boot.starter.test)
+    implementation(libs.spring.boot.starter.data.jdbc)
+    implementation(libs.spring.modulith.starter.core)
+    implementation(libs.spring.modulith.starter.jdbc)
 
+    runtimeOnly(libs.h2)
+
+    testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.junit.api)
     testImplementation(libs.junit.engine.jupiter)
     testImplementation(libs.assertj)
     testImplementation(libs.kotlin.junit.test)
-
 
     testRuntimeOnly(libs.junit.platform.launcher)
 }
@@ -40,6 +45,7 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
+        javaParameters = true
     }
 }
 
