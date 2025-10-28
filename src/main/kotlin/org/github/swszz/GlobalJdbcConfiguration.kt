@@ -16,7 +16,7 @@ import org.springframework.transaction.TransactionManager
 import javax.sql.DataSource
 
 @Configuration
-class GlobalDataJdbcConfig {
+class GlobalJdbcConfiguration {
 
     @Bean
     @ConfigurationProperties("spring.datasource.core")
