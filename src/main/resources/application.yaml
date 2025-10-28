@@ -3,21 +3,10 @@ spring:
     virtual:
       enabled: true
   datasource:
-    core:
-      url: jdbc:h2:mem:coredb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
-    order:
-      url: jdbc:h2:mem:orderdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
-    inventory:
-      url: jdbc:h2:mem:inventorydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
+    url: jdbc:h2:mem:coredb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
 
   h2:
     console:
