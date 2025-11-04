@@ -160,7 +160,7 @@ When creating services, use the appropriate transaction manager:
 ```kotlin
 @Service
 class MyService(private val repository: MyRepository) {
-    @Transactional("myModuleTransactionManager")
+    @Transactional
     fun doSomething() { ... }
 }
 ```

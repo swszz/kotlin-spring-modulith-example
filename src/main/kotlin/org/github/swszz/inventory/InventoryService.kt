@@ -1,5 +1,6 @@
 package org.github.swszz.inventory
 
+import org.github.swszz.core.Logger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -7,8 +8,9 @@ import org.springframework.transaction.annotation.Transactional
 class InventoryService(
     private val inventoryRepository: InventoryRepository
 ) {
-    @Transactional("inventoryTransactionManager")
+    @Transactional
     fun addInventory(productName: String, stockQuantity: Int): Inventory {
+        Logger.info { "Adding $productName $stockQuantity" }
         val inventory = Inventory(productName = productName, stockQuantity = stockQuantity)
         return inventoryRepository.save(inventory)
     }

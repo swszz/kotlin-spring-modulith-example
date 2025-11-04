@@ -48,13 +48,6 @@ The application uses Spring Modulith to enforce modular boundaries. Each module 
 
 ### Key Architectural Patterns
 
-**Transaction Management:**
-Each module uses its own transaction manager:
-- Order module: `@Transactional("orderTransactionManager")`
-- Inventory module: `@Transactional("inventoryTransactionManager")`
-
-This demonstrates isolation between modules despite using a shared H2 database.
-
 **Database Schema:**
 - Single H2 in-memory database (`coredb`)
 - Module-specific schema files: `schema-order.sql` and `schema-inventory.sql`
