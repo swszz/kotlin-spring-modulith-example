@@ -45,6 +45,7 @@ The application uses Spring Modulith to enforce modular boundaries. Each module 
 - `authentication`: Independent module with no dependencies (provides `@Authentication` annotation and AOP aspect)
 - `order`: Depends only on `core`
 - `inventory`: Depends on `authentication` and `core`
+- `facade`: Aggregation layer that depends on `inventory`, `order`, `authentication`, and `core`
 
 ### Key Architectural Patterns
 
@@ -83,6 +84,14 @@ The H2 console is available at `http://localhost:8080/h2-console` with:
 - JDBC URL: `jdbc:h2:mem:coredb`
 - Username: `sa`
 - Password: (empty)
+
+## API Endpoints
+
+### Facade Module
+- `GET /api/dashboard`: Aggregates data from inventory, order, and authentication modules
+  - Returns total orders count, total inventory items count, order summaries, and inventory summaries
+  - Protected by `@Authentication` aspect
+  - Example: `curl http://localhost:8080/api/dashboard`
 
 ## Configuration
 

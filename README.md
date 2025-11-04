@@ -9,7 +9,7 @@ This project demonstrates Spring Modulith's ability to enforce architectural bou
 ### Key Features
 
 - **Enforced Module Boundaries**: Spring Modulith verifies module dependencies at test time
-- **Module-Specific Transaction Management**: Each module has its own transaction manager for isolation
+- **Facade Pattern**: Aggregation layer that combines data from multiple modules
 - **Cross-Cutting Concerns with AOP**: Authentication aspect demonstrates module interaction patterns
 - **Automatic Documentation Generation**: Generates module diagrams and documentation
 - **Kotlin-First**: Built with Kotlin 2.2.21 and leverages Kotlin features
@@ -19,7 +19,7 @@ This project demonstrates Spring Modulith's ability to enforce architectural bou
 
 ### Module Structure
 
-The application consists of four modules with explicit dependencies:
+The application consists of five modules with explicit dependencies:
 
 ```
 core (shared utilities)
@@ -27,8 +27,11 @@ core (shared utilities)
   ├── authentication (AOP aspects, annotations)
   ├── order (order management)
   │     ↑
-  └── inventory (stock management)
-        ↑ (depends on both core and authentication)
+  ├── inventory (stock management)
+  │     ↑ (depends on both core and authentication)
+  │
+  └── facade (aggregation layer)
+        ↑ (depends on inventory, order, authentication, and core)
 ```
 
 Each module is defined by:
@@ -40,14 +43,15 @@ Each module is defined by:
 
 - **core**: Base module providing shared utilities (e.g., `Logger`)
 - **authentication**: Provides `@Authentication` annotation and AOP aspect for cross-cutting authentication concerns
-- **order**: Order management with its own transaction manager (`orderTransactionManager`)
-- **inventory**: Inventory management with authentication integration (`inventoryTransactionManager`)
+- **order**: Order management functionality
+- **inventory**: Inventory management with authentication integration
+- **facade**: Aggregation layer that combines data from multiple modules and exposes unified REST API endpoints
 
 ### Database Design
 
 - Single H2 in-memory database (`coredb`)
 - Module-specific schema files: `schema-order.sql` and `schema-inventory.sql`
-- Shared database with logical separation through transaction managers
+- Tables are logically grouped by module but share the same database
 
 ## Prerequisites
 
@@ -101,6 +105,45 @@ Visit `http://localhost:8080/h2-console` with the following credentials:
 - **JDBC URL**: `jdbc:h2:mem:coredb`
 - **Username**: `sa`
 - **Password**: (leave empty)
+
+## API Endpoints
+
+### Dashboard API (Facade Module)
+
+The facade module provides a unified API that aggregates data from multiple modules:
+
+**GET /api/dashboard**
+- Returns a comprehensive dashboard with order and inventory information
+- Protected by `@Authentication` aspect
+- Response includes:
+  - Total number of orders
+  - Total number of inventory items
+  - List of order summaries
+  - List of inventory summaries
+  - Authentication status
+
+**Example:**
+```bash
+curl http://localhost:8080/api/dashboard
+```
+
+**Response:**
+```json
+{
+  "totalOrders": 2,
+  "totalInventoryItems": 3,
+  "orders": [
+    {"id": 1, "productName": "Product A", "quantity": 10},
+    {"id": 2, "productName": "Product B", "quantity": 5}
+  ],
+  "inventories": [
+    {"id": 1, "productName": "Product A", "stockQuantity": 100},
+    {"id": 2, "productName": "Product B", "stockQuantity": 50},
+    {"id": 3, "productName": "Product C", "stockQuantity": 75}
+  ],
+  "isAuthenticated": true
+}
+```
 
 ## Important Tests
 
@@ -190,14 +233,17 @@ src/main/kotlin/org/github/swszz/
 │   ├── OrderModule.kt
 │   ├── Order.kt
 │   ├── OrderRepository.kt
-│   ├── OrderService.kt
-│   └── OrderController.kt
-└── inventory/
-    ├── InventoryModule.kt
-    ├── Inventory.kt
-    ├── InventoryRepository.kt
-    ├── InventoryService.kt
-    └── InventoryController.kt
+│   └── OrderService.kt
+├── inventory/
+│   ├── InventoryModule.kt
+│   ├── Inventory.kt
+│   ├── InventoryRepository.kt
+│   └── InventoryService.kt
+└── facade/
+    ├── FacadeModule.kt
+    ├── DashboardResponse.kt
+    ├── FacadeService.kt
+    └── FacadeController.kt
 ```
 
 ## Configuration
