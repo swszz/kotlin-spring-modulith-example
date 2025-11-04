@@ -1,5 +1,7 @@
 package org.github.swszz.inventory
 
+import org.github.swszz.authentication.Authentication
+import org.github.swszz.core.Logger
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,7 +15,9 @@ class InventoryController(
     }
 
     @GetMapping
+    @Authentication
     fun getAllInventory(): List<Inventory> {
+        Logger.info { "get all inventory" }
         return inventoryService.findAll()
     }
 }

@@ -1,5 +1,7 @@
 package org.github.swszz.order
 
+import org.github.swszz.authentication.Authentication
+import org.github.swszz.core.Logger
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,6 +16,7 @@ class OrderController(
 
     @GetMapping
     fun getAllOrders(): List<Order> {
+        Logger.info { "get all orders" }
         return orderService.findAll()
     }
 }

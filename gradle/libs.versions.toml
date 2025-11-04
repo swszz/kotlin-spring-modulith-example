@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.2.21"
 kotlin-coroutine = "1.10.2"
-spring-boot = "4.0.0-RC1"
+spring-boot = "4.0.0-M2"
 spring-dependency-management = "1.1.7"
 spring-modulith = "2.0.0-RC1"
 junit = "5.11.0"
@@ -21,14 +21,16 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutine" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutine" }
 
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
-spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc" }
-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter"}
+spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop"}
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web"}
+spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc"}
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test"}
 
 spring-modulith-bom = { module = "org.springframework.modulith:spring-modulith-bom", version.ref = "spring-modulith" }
 spring-modulith-starter-core = { module = "org.springframework.modulith:spring-modulith-starter-core" }
 spring-modulith-starter-jdbc = { module = "org.springframework.modulith:spring-modulith-starter-jdbc" }
+spring-modulith-starter-test = { module = "org.springframework.modulith:spring-modulith-starter-test" }
 
 h2 = { module = "com.h2database:h2" }
 

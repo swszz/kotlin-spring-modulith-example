@@ -27,6 +27,7 @@ dependencies {
     implementation(platform(libs.spring.modulith.bom))
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.aop)
     implementation(libs.spring.boot.starter.data.jdbc)
     implementation(libs.spring.modulith.starter.core)
     implementation(libs.spring.modulith.starter.jdbc)
@@ -34,6 +35,7 @@ dependencies {
     runtimeOnly(libs.h2)
 
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.modulith.starter.test)
     testImplementation(libs.junit.api)
     testImplementation(libs.junit.engine.jupiter)
     testImplementation(libs.assertj)
