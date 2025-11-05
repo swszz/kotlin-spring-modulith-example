@@ -2,5 +2,7 @@ package org.github.swszz.authentication
 
 import org.springframework.modulith.ApplicationModule
 
-@ApplicationModule
+@ApplicationModule(
+    allowedDependencies = ["core"]
+)
 class AuthenticationModule
