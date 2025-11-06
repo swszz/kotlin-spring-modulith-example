@@ -9,7 +9,8 @@ This project demonstrates Spring Modulith's ability to enforce architectural bou
 ### Key Features
 
 - **Enforced Module Boundaries**: Spring Modulith verifies module dependencies at test time
-- **Facade Pattern**: Aggregation layer that combines data from multiple modules
+- **Event-Driven Architecture**: Decoupled inter-module communication using Spring's event system
+- **Presentation Layer Pattern**: Aggregation layer that combines data from multiple modules
 - **Cross-Cutting Concerns with AOP**: Authentication aspect demonstrates module interaction patterns
 - **Automatic Documentation Generation**: Generates module diagrams and documentation
 - **Kotlin-First**: Built with Kotlin 2.2.21 and leverages Kotlin features
@@ -19,19 +20,22 @@ This project demonstrates Spring Modulith's ability to enforce architectural bou
 
 ### Module Structure
 
-The application consists of five modules with explicit dependencies:
+The application consists of seven modules with explicit dependencies:
 
 ```
 core (shared utilities)
   ↑
   ├── authentication (AOP aspects, annotations)
+  ├── event (OPEN module for event definitions)
   ├── order (order management)
   │     ↑
   ├── inventory (stock management)
-  │     ↑ (depends on both core and authentication)
+  │     ↑ (depends on core, authentication, and event)
+  ├── user (user management)
+  │     ↑ (depends on core and event)
   │
-  └── facade (aggregation layer)
-        ↑ (depends on inventory, order, authentication, and core)
+  └── presentation (aggregation layer)
+        ↑ (depends on inventory, order, user, authentication, and core)
 ```
 
 Each module is defined by:
@@ -41,11 +45,13 @@ Each module is defined by:
 
 ### Module Descriptions
 
-- **core**: Base module providing shared utilities (e.g., `Logger`)
+- **core**: Base module providing shared utilities (e.g., `Logger`, `KafkaConfiguration`)
 - **authentication**: Provides `@Authentication` annotation and AOP aspect for cross-cutting authentication concerns
+- **event**: OPEN module containing shared event definitions for inter-module communication (e.g., `InventoryAccessEvent`)
 - **order**: Order management functionality
-- **inventory**: Inventory management with authentication integration
-- **facade**: Aggregation layer that combines data from multiple modules and exposes unified REST API endpoints
+- **inventory**: Inventory management with authentication integration, publishes events when accessed
+- **user**: User management functionality, can listen to events from other modules
+- **presentation**: Aggregation layer that combines data from multiple modules and exposes unified REST API endpoints
 
 ### Database Design
 
@@ -108,18 +114,19 @@ Visit `http://localhost:8080/h2-console` with the following credentials:
 
 ## API Endpoints
 
-### Dashboard API (Facade Module)
+### Dashboard API (Presentation Module)
 
-The facade module provides a unified API that aggregates data from multiple modules:
+The presentation module provides a unified API that aggregates data from multiple modules:
 
 **GET /api/dashboard**
-- Returns a comprehensive dashboard with order and inventory information
+- Returns a comprehensive dashboard with order, inventory, and user information
 - Protected by `@Authentication` aspect
 - Response includes:
   - Total number of orders
   - Total number of inventory items
   - List of order summaries
   - List of inventory summaries
+  - User information
   - Authentication status
 
 **Example:**
@@ -141,7 +148,8 @@ curl http://localhost:8080/api/dashboard
     {"id": 2, "productName": "Product B", "stockQuantity": 50},
     {"id": 3, "productName": "Product C", "stockQuantity": 75}
   ],
-  "isAuthenticated": true
+  "isAuthenticated": true,
+  "userName": "uuid-string"
 }
 ```
 
@@ -184,6 +192,10 @@ Generates module diagrams and documentation in the build output.
 ```kotlin
 @ApplicationModule(allowedDependencies = ["core"])
 class MyNewModule
+
+// For shared modules accessible to all:
+@ApplicationModule(type = ApplicationModule.Type.OPEN)
+class SharedModule
 ```
 
 3. Create schema file if needed: `src/main/resources/schema-mynew.sql`
@@ -195,6 +207,37 @@ class MyNewModule
 1. Update `allowedDependencies` in the module's `@ApplicationModule` annotation
 2. Run `verifyModularStructure()` test to ensure compliance
 3. Avoid direct references to classes in non-allowed modules
+4. Note: OPEN modules (like `event`) are automatically accessible without explicit declaration
+
+### Implementing Event-Driven Communication
+
+1. Define event data classes in the `event` module:
+```kotlin
+package org.github.swszz.event.inventory
+
+data class InventoryAccessEvent(val inventoryName: String)
+```
+
+2. Publish events from any module using `ApplicationEventPublisher`:
+```kotlin
+@Service
+class MyService(private val eventPublisher: ApplicationEventPublisher) {
+    fun doSomething() {
+        eventPublisher.publishEvent(InventoryAccessEvent("item-name"))
+    }
+}
+```
+
+3. Listen to events in other modules:
+```kotlin
+@Service
+class MyListener {
+    @EventListener
+    fun handleEvent(event: InventoryAccessEvent) {
+        // Handle event
+    }
+}
+```
 
 ### Transaction Management
 
@@ -224,11 +267,17 @@ src/main/kotlin/org/github/swszz/
 ├── SpringBootTemplateApplication.kt
 ├── core/
 │   ├── CoreModule.kt
-│   └── Logger.kt
+│   ├── Logger.kt
+│   └── libs/
+│       └── KafkaConfiguration.kt
 ├── authentication/
 │   ├── AuthenticationModule.kt
 │   ├── Authentication.kt
 │   └── AuthenticationAspect.kt
+├── event/
+│   ├── EventModule.kt (OPEN module)
+│   └── inventory/
+│       └── InventoryAccessEvent.kt
 ├── order/
 │   ├── OrderModule.kt
 │   ├── Order.kt
@@ -238,12 +287,16 @@ src/main/kotlin/org/github/swszz/
 │   ├── InventoryModule.kt
 │   ├── Inventory.kt
 │   ├── InventoryRepository.kt
-│   └── InventoryService.kt
-└── facade/
-    ├── FacadeModule.kt
+│   ├── InventoryService.kt
+│   └── InventoryController.kt
+├── user/
+│   ├── UserModule.kt
+│   └── UserService.kt
+└── presentation/
+    ├── PresentationModule.kt
     ├── DashboardResponse.kt
-    ├── FacadeService.kt
-    └── FacadeController.kt
+    ├── PresentationService.kt
+    └── PresentationController.kt
 ```
 
 ## Configuration
