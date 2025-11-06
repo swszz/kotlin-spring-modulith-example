@@ -1,10 +1,13 @@
 # Kotlin Spring Modulith Example
 
-A sample project demonstrating **modular monolith architecture** using Spring Modulith with Kotlin, showcasing how to build well-structured, maintainable applications with enforced module boundaries.
+A sample project demonstrating **modular monolith architecture** using Spring Modulith with Kotlin, showcasing how to
+build well-structured, maintainable applications with enforced module boundaries.
 
 ## Overview
 
-This project demonstrates Spring Modulith's ability to enforce architectural boundaries within a monolithic application. Unlike traditional monoliths where any code can call any other code, Spring Modulith allows you to define clear module boundaries and dependencies, making your codebase more maintainable and easier to understand.
+This project demonstrates Spring Modulith's ability to enforce architectural boundaries within a monolithic application.
+Unlike traditional monoliths where any code can call any other code, Spring Modulith allows you to define clear module
+boundaries and dependencies, making your codebase more maintainable and easier to understand.
 
 ### Key Features
 
@@ -21,6 +24,7 @@ This project demonstrates Spring Modulith's ability to enforce architectural bou
 ### Module Structure
 
 The application consists of seven modules with explicit dependencies:
+![components](image/components.png)
 
 ```
 core (shared utilities)
@@ -39,6 +43,7 @@ core (shared utilities)
 ```
 
 Each module is defined by:
+
 1. A package under `org.github.swszz.<module-name>`
 2. A `@ApplicationModule` class declaring allowed dependencies
 3. Module-specific services, repositories, and controllers
@@ -47,7 +52,8 @@ Each module is defined by:
 
 - **core**: Base module providing shared utilities (e.g., `Logger`, `KafkaConfiguration`)
 - **authentication**: Provides `@Authentication` annotation and AOP aspect for cross-cutting authentication concerns
-- **event**: OPEN module containing shared event definitions for inter-module communication (e.g., `InventoryAccessEvent`)
+- **event**: OPEN module containing shared event definitions for inter-module communication (e.g.,
+  `InventoryAccessEvent`)
 - **order**: Order management functionality
 - **inventory**: Inventory management with authentication integration, publishes events when accessed
 - **user**: User management functionality, can listen to events from other modules
@@ -119,34 +125,57 @@ Visit `http://localhost:8080/h2-console` with the following credentials:
 The presentation module provides a unified API that aggregates data from multiple modules:
 
 **GET /api/dashboard**
+
 - Returns a comprehensive dashboard with order, inventory, and user information
 - Protected by `@Authentication` aspect
 - Response includes:
-  - Total number of orders
-  - Total number of inventory items
-  - List of order summaries
-  - List of inventory summaries
-  - User information
-  - Authentication status
+    - Total number of orders
+    - Total number of inventory items
+    - List of order summaries
+    - List of inventory summaries
+    - User information
+    - Authentication status
 
 **Example:**
+
 ```bash
 curl http://localhost:8080/api/dashboard
 ```
 
 **Response:**
+
 ```json
 {
   "totalOrders": 2,
   "totalInventoryItems": 3,
   "orders": [
-    {"id": 1, "productName": "Product A", "quantity": 10},
-    {"id": 2, "productName": "Product B", "quantity": 5}
+    {
+      "id": 1,
+      "productName": "Product A",
+      "quantity": 10
+    },
+    {
+      "id": 2,
+      "productName": "Product B",
+      "quantity": 5
+    }
   ],
   "inventories": [
-    {"id": 1, "productName": "Product A", "stockQuantity": 100},
-    {"id": 2, "productName": "Product B", "stockQuantity": 50},
-    {"id": 3, "productName": "Product C", "stockQuantity": 75}
+    {
+      "id": 1,
+      "productName": "Product A",
+      "stockQuantity": 100
+    },
+    {
+      "id": 2,
+      "productName": "Product B",
+      "stockQuantity": 50
+    },
+    {
+      "id": 3,
+      "productName": "Product C",
+      "stockQuantity": 75
+    }
   ],
   "isAuthenticated": true,
   "userName": "uuid-string"
@@ -167,6 +196,7 @@ fun verifyModularStructure() {
 ```
 
 This test **fails** if:
+
 - A module accesses another module not listed in its `allowedDependencies`
 - Circular dependencies are introduced
 - Module boundaries are violated
@@ -212,6 +242,7 @@ class SharedModule
 ### Implementing Event-Driven Communication
 
 1. Define event data classes in the `event` module:
+
 ```kotlin
 package org.github.swszz.event.inventory
 
@@ -219,6 +250,7 @@ data class InventoryAccessEvent(val inventoryName: String)
 ```
 
 2. Publish events from any module using `ApplicationEventPublisher`:
+
 ```kotlin
 @Service
 class MyService(private val eventPublisher: ApplicationEventPublisher) {
@@ -229,6 +261,7 @@ class MyService(private val eventPublisher: ApplicationEventPublisher) {
 ```
 
 3. Listen to events in other modules:
+
 ```kotlin
 @Service
 class MyListener {
@@ -247,7 +280,9 @@ When creating services, use the appropriate transaction manager:
 @Service
 class MyService(private val repository: MyRepository) {
     @Transactional
-    fun doSomething() { ... }
+    fun doSomething() {
+        ...
+    }
 }
 ```
 
@@ -304,6 +339,7 @@ src/main/kotlin/org/github/swszz/
 Dependencies are managed using Gradle version catalogs (`gradle/libs.versions.toml`).
 
 Key configuration in `application.yaml`:
+
 - Virtual threads enabled: `spring.threads.virtual.enabled: true`
 - H2 console enabled at `/h2-console`
 - Spring Modulith debug logging enabled
