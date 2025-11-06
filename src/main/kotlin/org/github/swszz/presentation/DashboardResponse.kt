@@ -1,4 +1,4 @@
-package org.github.swszz.facade
+package org.github.swszz.presentation
 
 import org.github.swszz.inventory.Inventory
 import org.github.swszz.order.Order
@@ -8,7 +8,8 @@ data class DashboardResponse(
     val totalInventoryItems: Int,
     val orders: List<OrderSummary>,
     val inventories: List<InventorySummary>,
-    val isAuthenticated: Boolean
+    val isAuthenticated: Boolean,
+    val userName: String,
 )
 
 data class OrderSummary(
